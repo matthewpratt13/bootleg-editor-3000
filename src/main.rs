@@ -1,7 +1,7 @@
 use clap::Parser;
 use std::{
-    fs::File,
-    io::{BufRead, BufReader, Error},
+    fs::{self, File, OpenOptions},
+    io::{self, BufRead, BufReader, Error},
     path::PathBuf,
 };
 
@@ -37,13 +37,44 @@ pub enum Command {
     },
 }
 
-
 #[allow(dead_code)]
 #[derive(Debug, Default)]
 struct CSVFile {
     data: Vec<Vec<String>>,
     rows: usize,
     cols: usize,
+}
+
+impl CSVFile {
+    pub fn display(&self) {
+        for row in &self.data {
+            println!("{}", row.join(", "))
+        }
+    }
+
+    pub fn modify(&mut self, row: usize, col: usize, new_val: String) {
+        if row < self.data.len() && col < self.data[row].len() {
+            self.data[row][col] = new_val
+        }
+    }
+
+    pub fn read_input(&self, row:L) -> Command {
+        let mut buf = String::new();
+
+        io::stdin().read_line(&mut buf).expect("unable to read line");
+
+        let input: usize = buf.trim().parse().unwrap_or(0)
+
+        match command {
+            1 => Command::Display,
+            2 => Command::Replace
+        }
+
+
+    }
+
+
+
 }
 
 pub trait CSVFileReader {
@@ -71,7 +102,10 @@ fn main() {
 
     // match and execute command
     match args.command {
-        Command::Display => println!("--Display CSVFile--"),
+        Command::Display => {
+            println!("--Display CSVFile--")
+            csv.display()
+        },
         Command::Replace { row, col, data } => println!("--Replace and write to file--"),
     }
 }
